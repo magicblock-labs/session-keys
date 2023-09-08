@@ -6,23 +6,13 @@ seeds = true
 skip-lint = false
 
 [programs.localnet]
-gpl_core = "6MhUAJtKdJx3RDCffUsJsQm8xy9YhhywjEmMYrxRc5j6"
-gpl_compression = "41kNwkQ9jESNYZJyAA1ENscQfx7vfkEf6uetVSFmfyaW"
-gpl_session = "3ao63wcSRNa76bncC2M3KupNtXBFiDyNbgK52VG7dLaE"
-gpl_nameservice = "5kWEYrdyryq3jGP5sUcKwTySzxr3dHzWFBVA3vkt6Nj5"
+gpl_session = "KeyspM2ssCJbqUhQ4k7sveSiY4WjnYsrXkC8oDbwde5"
 
 [programs.devnet]
-gpl_core = "6MhUAJtKdJx3RDCffUsJsQm8xy9YhhywjEmMYrxRc5j6"
-gpl_compression = "41kNwkQ9jESNYZJyAA1ENscQfx7vfkEf6uetVSFmfyaW"
-gpl_session = "3ao63wcSRNa76bncC2M3KupNtXBFiDyNbgK52VG7dLaE"
-gpl_nameservice = "5kWEYrdyryq3jGP5sUcKwTySzxr3dHzWFBVA3vkt6Nj5"
+gpl_session = "KeyspM2ssCJbqUhQ4k7sveSiY4WjnYsrXkC8oDbwde5"
 
 [programs.mainnet]
-gpl_core = "6MhUAJtKdJx3RDCffUsJsQm8xy9YhhywjEmMYrxRc5j6"
-gpl_compression = "41kNwkQ9jESNYZJyAA1ENscQfx7vfkEf6uetVSFmfyaW"
-gpl_session = "3ao63wcSRNa76bncC2M3KupNtXBFiDyNbgK52VG7dLaE"
-gpl_nameservice = "5kWEYrdyryq3jGP5sUcKwTySzxr3dHzWFBVA3vkt6Nj5"
-
+gpl_session = "KeyspM2ssCJbqUhQ4k7sveSiY4WjnYsrXkC8oDbwde5"
 
 [[test.genesis]]
 address="cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK"
@@ -36,8 +26,8 @@ program="test-programs/spl_noop.so"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
-wallet = "/Users/abishek/.config/solana/id.json"
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000"

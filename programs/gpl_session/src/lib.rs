@@ -7,14 +7,15 @@ pub use gpl_session_macros::*;
 
 declare_id!("3ao63wcSRNa76bncC2M3KupNtXBFiDyNbgK52VG7dLaE");
 
+
 #[cfg(not(feature = "no-entrypoint"))]
 solana_security_txt::security_txt! {
     name: "gpl_session",
-    project_url: "https://gum.fun",
-    contacts: "email:hello@gum.fun,twitter:@gumisfunn",
+    project_url: "https://magicblock.gg",
+    contacts: "email:dev@magicblock.gg,twitter:@magicblock",
     policy: "",
     preferred_languages: "en",
-    source_code: "https://github.com/gumhq/gpl"
+    source_code: "https://github.com/magicblock-labs"
 }
 
 #[program]

@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "programs/*",
+    "programs/gpl_session",
     "programs/gpl_session/macros",
     "programs/gpl_session/macros/attribute",
 ]
