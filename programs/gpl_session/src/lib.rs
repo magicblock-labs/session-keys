@@ -3,7 +3,7 @@ use anchor_lang::solana_program::native_token::LAMPORTS_PER_SOL;
 use anchor_lang::system_program;
 
 #[cfg(feature = "no-entrypoint")]
-pub use gpl_session_macros::*;
+pub use session_keys_macros::*;
 
 declare_id!("KeyspM2ssCJbqUhQ4k7sveSiY4WjnYsrXkC8oDbwde5");
 
