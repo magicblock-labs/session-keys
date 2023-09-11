@@ -570,31 +570,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gpl-session"
-version = "2.0.1"
-dependencies = [
- "anchor-lang",
- "gpl-session-macros",
- "solana-security-txt",
-]
-
-[[package]]
-name = "gpl-session-macros"
-version = "0.1.1"
-dependencies = [
- "gpl-session-macros-attribute",
-]
-
-[[package]]
-name = "gpl-session-macros-attribute"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "hashbrown"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1112,6 +1087,31 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
+]
+
+[[package]]
+name = "session-keys"
+version = "2.0.1"
+dependencies = [
+ "anchor-lang",
+ "session-keys-macros",
+ "solana-security-txt",
+]
+
+[[package]]
+name = "session-keys-macros"
+version = "0.1.1"
+dependencies = [
+ "session-keys-macros-attribute",
+]
+
+[[package]]
+name = "session-keys-macros-attribute"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
 ]
 
 [[package]]
