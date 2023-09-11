@@ -1,11 +1,11 @@
 [package]
 name = "gpl-session"
-version = "2.0.0"
+version = "2.0.1"
 edition = "2021"
-authors = ["Gum Core Dev <hello@gum.fun>"]
+authors = ["Gum Core Dev <dev@magicblock.gg>"]
 license = "GPL-3.0-or-later"
 description = "Gum Session Protocol (GPL Session)"
-repository = "https://github.com/gumhq/gpl"
+repository = "https://github.com/magicblock-labs/gum-program-library"
 
 [lib]
 crate-type = ["cdylib", "lib"]
