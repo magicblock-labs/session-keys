@@ -8,13 +8,7 @@ Manage sessions in your Solana Anchor Programs.
 
 
 ```bash
-cargo add session-keys@1.0.0 --features no-entrypoint
-```
-
-If you're using anchor 0.26.0
-
-```bash
-cargo add session-keys@0.2.0 --features no-entrypoint
+cargo add session-keys --features no-entrypoint
 ```
 
 # Usage
@@ -22,7 +16,7 @@ cargo add session-keys@0.2.0 --features no-entrypoint
 1. Import the dependencies
 
 ```rust
-use gpl_session::{SessionError, SessionToken, session_auth_or, Session};
+use session_keys::{SessionError, SessionToken, session_auth_or, Session};
 ```
 
 2. Derive the `Session` trait on your instruction struct
@@ -60,3 +54,7 @@ pub fn ix_handler(ctx: Context<Instruction>,) -> Result<()> {
 }
 
 ```
+
+# Example
+
+See [KamikazeJoe](https://github.com/magicblock-labs/Kamikaze-Joe) for an example of a game using session-keys.
