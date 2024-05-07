@@ -1,6 +1,6 @@
 [package]
 name = "session-keys"
-version = "2.0.2"
+version = "2.0.4"
 edition = "2021"
 authors = ["Gum Core Dev <dev@magicblock.gg>"]
 license = "GPL-3.0-or-later"
@@ -17,8 +17,9 @@ no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
 default = []
+idl-build = ["anchor-lang/idl-build"]
 
 [dependencies]
-anchor-lang = "^0.29.0"
-solana-security-txt = "^1.1.0"
+anchor-lang = "=0.30.0"
+solana-security-txt = "=1.1.1"
 session-keys-macros = { version = "0.1.1", path = "macros", optional = true }
