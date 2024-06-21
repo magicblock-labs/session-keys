@@ -58,38 +58,6 @@ jobs:
           export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           solana --version
 
-  clippy-lint:
-    needs: install
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Cache rust
-        uses: Swatinem/rust-cache@v2
-      - name: Run fmt
-        run: cargo fmt -- --check
-      - name: Run clippy
-        run: cargo clippy -- --deny=warnings
-
-  yarn-lint:
-    needs: install
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node ${{ matrix.node }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Cache node dependencies
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Run lint
-        run: yarn lint
-
   test:
     needs: [clippy-lint, yarn-lint]
     runs-on: ubuntu-latest

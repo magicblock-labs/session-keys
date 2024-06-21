@@ -1,6 +1,3 @@
-anchor_version = "0.26.0"
-solana_version = "1.13.8"
-
 [features]
 seeds = true
 skip-lint = false
@@ -26,7 +23,7 @@ program="test-programs/spl_noop.so"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "https://staging-rpc.dev.eclipsenetwork.xyz"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
