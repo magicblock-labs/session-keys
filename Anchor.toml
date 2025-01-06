@@ -11,14 +11,6 @@ gpl_session = "KeyspM2ssCJbqUhQ4k7sveSiY4WjnYsrXkC8oDbwde5"
 [programs.mainnet]
 gpl_session = "KeyspM2ssCJbqUhQ4k7sveSiY4WjnYsrXkC8oDbwde5"
 
-[[test.genesis]]
-address="cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK"
-program="test-programs/spl_account_compression.so"
-
-[[test.genesis]]
-address="noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV"
-program="test-programs/spl_noop.so"
-
 [registry]
 url = "https://api.apr.dev"
 

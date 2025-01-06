@@ -1,6 +1,6 @@
 [package]
 name = "session-keys"
-version = "2.0.5"
+version = "2.0.6"
 edition = "2021"
 authors = ["Gum Core Dev <dev@magicblock.gg>"]
 license = "GPL-3.0-or-later"

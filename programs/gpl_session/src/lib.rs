@@ -27,12 +27,13 @@ pub mod gpl_session {
         ctx: Context<CreateSessionToken>,
         top_up: Option<bool>,
         valid_until: Option<i64>,
+        lamports: Option<u64>,
     ) -> Result<()> {
         // Set top up to false by default
         let top_up = top_up.unwrap_or(false);
         // Set valid until to 1 hour from now by default
         let valid_until = valid_until.unwrap_or(Clock::get()?.unix_timestamp + 60 * 60 * 1);
-        create_session_token_handler(ctx, top_up, valid_until)
+        create_session_token_handler(ctx, top_up, valid_until, lamports)
     }
 
     // revoke a session token
@@ -75,6 +76,7 @@ pub fn create_session_token_handler(
     ctx: Context<CreateSessionToken>,
     top_up: bool,
     valid_until: i64,
+    lamports: Option<u64>,
 ) -> Result<()> {
     // Valid until can't be greater than a week
     require!(
@@ -101,7 +103,7 @@ pub fn create_session_token_handler(
                     to: ctx.accounts.session_signer.to_account_info(),
                 },
             ),
-            LAMPORTS_PER_SOL.checked_div(100).unwrap(),
+            lamports.unwrap_or(LAMPORTS_PER_SOL / 100),
         )?;
     }
 
