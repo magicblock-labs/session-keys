@@ -5,7 +5,7 @@ use anchor_lang::system_program;
 #[cfg(feature = "no-entrypoint")]
 pub use session_keys_macros::*;
 
-declare_id!("KeyspM2ssCJbqUhQ4k7sveSiY4WjnYsrXkC8oDbwde5");
+declare_id!("3ao63wcSRNa76bncC2M3KupNtXBFiDyNbgK52VG7dLaE");
 
 
 #[cfg(not(feature = "no-entrypoint"))]
