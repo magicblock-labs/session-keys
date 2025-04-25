@@ -10,7 +10,7 @@ declare_id!("KeyspM2ssCJbqUhQ4k7sveSiY4WjnYsrXkC8oDbwde5");
 
 #[cfg(not(feature = "no-entrypoint"))]
 solana_security_txt::security_txt! {
-    name: "gpl_session",
+    name: "session_keys",
     project_url: "https://magicblock.gg",
     contacts: "email:dev@magicblock.gg,twitter:@magicblock",
     policy: "",
