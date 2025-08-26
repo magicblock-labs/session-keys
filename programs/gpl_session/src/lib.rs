@@ -165,7 +165,7 @@ pub struct CreateSessionTokenWithPayer<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
     pub authority: Signer<'info>,
-    #[account(mut)]
+
     /// CHECK the target program is actually a program.
     #[account(executable)]
     pub target_program: AccountInfo<'info>,
