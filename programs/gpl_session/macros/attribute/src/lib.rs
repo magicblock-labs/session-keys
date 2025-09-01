@@ -3,7 +3,8 @@ use quote::{quote, ToTokens};
 
 use syn::{
     parse::{Parse, ParseStream},
-    parse_macro_input, Data, DeriveInput, Fields, Token,
+    parse_macro_input, Data, DeriveInput, Fields, GenericArgument, PathArguments, Token, Type,
+    TypePath,
 };
 
 struct SessionArgs {
@@ -24,6 +25,45 @@ impl Parse for SessionArgs {
 
 fn is_session(attr: &syn::Attribute) -> bool {
     attr.path.is_ident("session")
+}
+
+fn is_option_account_sessiontoken(ty: &Type) -> bool {
+    let Type::Path(TypePath { path, .. }) = ty else {
+        return false;
+    };
+    let Some(seg) = path.segments.first() else {
+        return false;
+    };
+    if seg.ident != "Option" {
+        return false;
+    }
+    let PathArguments::AngleBracketed(ref opt_args) = seg.arguments else {
+        return false;
+    };
+    let Some(GenericArgument::Type(Type::Path(TypePath {
+        path: acct_path, ..
+    }))) = opt_args.args.first()
+    else {
+        return false;
+    };
+    let Some(acct_seg) = acct_path.segments.first() else {
+        return false;
+    };
+    if acct_seg.ident != "Account" {
+        return false;
+    }
+    let PathArguments::AngleBracketed(ref acct_args) = acct_seg.arguments else {
+        return false;
+    };
+    let mut args = acct_args.args.iter();
+    let Some(GenericArgument::Lifetime(_)) = args.next() else {
+        return false;
+    };
+    let Some(GenericArgument::Type(Type::Path(TypePath { path: st_path, .. }))) = args.next()
+    else {
+        return false;
+    };
+    st_path.segments.len() == 1 && st_path.segments[0].ident == "SessionToken"
 }
 
 // Macro to derive Session Trait
@@ -47,12 +87,8 @@ pub fn derive(input: TokenStream) -> TokenStream {
         .expect("Session trait can only be derived for structs with a session_token field");
     {
         let session_token_type = &session_token_field.ty;
-        let session_token_type_string = quote! { #session_token_type }.to_string();
-        assert!(
-        session_token_type_string == "Option < Account < 'info, SessionToken > >",
-        "Session trait can only be derived for structs with a session_token field of type Option<Account<'info, SessionToken>>"
-        );
-    };
+        assert!(is_option_account_sessiontoken(session_token_type), "Session trait can only be derived for structs with a session_token field of type Option<Account<'info, SessionToken>>");
+    }
 
     // Session Token field must have the #[session] attribute
     let session_attr = session_token_field
