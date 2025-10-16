@@ -456,7 +456,7 @@ impl SessionTokenV2 {
 impl SessionTokenV2 {
     pub fn is_expired(&self) -> Result<bool> {
         let now = Clock::get()?.unix_timestamp;
-        Ok(now < self.valid_until)
+        Ok(now > self.valid_until)
     }
 
     // validate the token
