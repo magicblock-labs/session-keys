@@ -1,7 +1,8 @@
-use anchor_lang::{prelude::*, solana_program::native_token::LAMPORTS_PER_SOL, system_program};
+use anchor_lang::{prelude::*, system_program};
 
 #[cfg(feature = "no-entrypoint")]
 pub use session_keys_macros::*;
+const LAMPORTS_PER_SOL: u64 = 1_000_000_000;
 
 declare_id!("KeyspM2ssCJbqUhQ4k7sveSiY4WjnYsrXkC8oDbwde5");
 
