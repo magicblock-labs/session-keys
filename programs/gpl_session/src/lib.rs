@@ -1,4 +1,9 @@
-use anchor_lang::{prelude::*, solana_program::native_token::LAMPORTS_PER_SOL, system_program};
+#![allow(unexpected_cfgs)]
+
+use anchor_lang::prelude::*;
+use anchor_lang::system_program;
+
+const LAMPORTS_PER_SOL: u64 = 1_000_000_000;
 
 #[cfg(feature = "no-entrypoint")]
 pub use session_keys_macros::*;
@@ -49,7 +54,12 @@ pub mod gpl_session {
     // Added the V2 instructions to support the new session token format.
     // The new format allows session to be created with a payer which on revoking
     // would send the lamports back to the payer.
-    pub fn create_session_v2(ctx: Context<CreateSessionTokenV2>, top_up: Option<bool>, valid_until: Option<i64>, lamports: Option<u64>) -> Result<()> {
+    pub fn create_session_v2(
+        ctx: Context<CreateSessionTokenV2>,
+        top_up: Option<bool>,
+        valid_until: Option<i64>,
+        lamports: Option<u64>,
+    ) -> Result<()> {
         let (top_up, valid_until) = process_session_params(top_up, valid_until)?;
         create_session_token_handler_v2(ctx, top_up, valid_until, lamports)
     }
@@ -61,7 +71,7 @@ pub mod gpl_session {
 
 fn process_session_params(top_up: Option<bool>, valid_until: Option<i64>) -> Result<(bool, i64)> {
     let top_up = top_up.unwrap_or(false);
-    let valid_until = valid_until.unwrap_or(Clock::get()?.unix_timestamp + 60 * 60 * 1);
+    let valid_until = valid_until.unwrap_or(Clock::get()?.unix_timestamp + 60 * 60);
     Ok((top_up, valid_until))
 }
 
@@ -94,18 +104,28 @@ pub struct CreateSessionToken<'info> {
     pub system_program: Program<'info, System>,
 }
 
-fn create_session_token_internal<'info>(
-    session_token: &mut Account<'info, SessionToken>,
+struct CreateSessionTokenParams {
     authority: Pubkey,
     target_program: Pubkey,
     session_signer: Pubkey,
-    system_program: AccountInfo<'info>,
-    payer: AccountInfo<'info>,
-    session_signer_account: AccountInfo<'info>,
     top_up: bool,
     valid_until: i64,
     lamports: Option<u64>,
+}
+
+fn create_session_token_internal<'info>(
+    session_token: &mut Account<'info, SessionToken>,
+    params: CreateSessionTokenParams,
+    system_program: AccountInfo<'info>,
+    payer: AccountInfo<'info>,
+    session_signer_account: AccountInfo<'info>,
 ) -> Result<()> {
+    let authority = params.authority;
+    let target_program = params.target_program;
+    let session_signer = params.session_signer;
+    let top_up = params.top_up;
+    let valid_until = params.valid_until;
+    let lamports = params.lamports;
     // Valid until can't be greater than a week
     require!(
         valid_until <= Clock::get()?.unix_timestamp + (60 * 60 * 24 * 7),
@@ -145,15 +165,17 @@ pub fn create_session_token_handler(
 ) -> Result<()> {
     create_session_token_internal(
         &mut ctx.accounts.session_token,
-        ctx.accounts.authority.key(),
-        ctx.accounts.target_program.key(),
-        ctx.accounts.session_signer.key(),
+        CreateSessionTokenParams {
+            authority: ctx.accounts.authority.key(),
+            target_program: ctx.accounts.target_program.key(),
+            session_signer: ctx.accounts.session_signer.key(),
+            top_up,
+            valid_until,
+            lamports,
+        },
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.authority.to_account_info(),
         ctx.accounts.session_signer.to_account_info(),
-        top_up,
-        valid_until,
-        lamports,
     )
 }
 
@@ -196,15 +218,17 @@ pub fn create_session_token_with_payer_handler(
 ) -> Result<()> {
     create_session_token_internal(
         &mut ctx.accounts.session_token,
-        ctx.accounts.authority.key(),
-        ctx.accounts.target_program.key(),
-        ctx.accounts.session_signer.key(),
+        CreateSessionTokenParams {
+            authority: ctx.accounts.authority.key(),
+            target_program: ctx.accounts.target_program.key(),
+            session_signer: ctx.accounts.session_signer.key(),
+            top_up,
+            valid_until,
+            lamports,
+        },
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.payer.to_account_info(),
         ctx.accounts.session_signer.to_account_info(),
-        top_up,
-        valid_until,
-        lamports,
     )
 }
 
@@ -276,19 +300,30 @@ pub struct CreateSessionTokenV2<'info> {
     pub system_program: Program<'info, System>,
 }
 
-fn create_session_token_v2_internal<'info>(
-    session_token: &mut Account<'info, SessionTokenV2>,
+struct CreateSessionTokenV2Params {
     authority: Pubkey,
     target_program: Pubkey,
     session_signer: Pubkey,
     fee_payer: Pubkey,
-    system_program: AccountInfo<'info>,
-    payer: AccountInfo<'info>,
-    session_signer_account: AccountInfo<'info>,
     top_up: bool,
     valid_until: i64,
     lamports: Option<u64>,
+}
+
+fn create_session_token_v2_internal<'info>(
+    session_token: &mut Account<'info, SessionTokenV2>,
+    params: CreateSessionTokenV2Params,
+    system_program: AccountInfo<'info>,
+    payer: AccountInfo<'info>,
+    session_signer_account: AccountInfo<'info>,
 ) -> Result<()> {
+    let authority = params.authority;
+    let target_program = params.target_program;
+    let session_signer = params.session_signer;
+    let fee_payer = params.fee_payer;
+    let top_up = params.top_up;
+    let valid_until = params.valid_until;
+    let lamports = params.lamports;
     // Valid until can't be greater than a week
     require!(
         valid_until <= Clock::get()?.unix_timestamp + (60 * 60 * 24 * 7),
@@ -329,16 +364,18 @@ pub fn create_session_token_handler_v2(
 ) -> Result<()> {
     create_session_token_v2_internal(
         &mut ctx.accounts.session_token,
-        ctx.accounts.authority.key(),
-        ctx.accounts.target_program.key(),
-        ctx.accounts.session_signer.key(),
-        ctx.accounts.fee_payer.key(),
+        CreateSessionTokenV2Params {
+            authority: ctx.accounts.authority.key(),
+            target_program: ctx.accounts.target_program.key(),
+            session_signer: ctx.accounts.session_signer.key(),
+            fee_payer: ctx.accounts.fee_payer.key(),
+            top_up,
+            valid_until,
+            lamports,
+        },
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.fee_payer.to_account_info(),
         ctx.accounts.session_signer.to_account_info(),
-        top_up,
-        valid_until,
-        lamports,
     )
 }
 
@@ -375,8 +412,11 @@ pub struct RevokeSessionTokenV2<'info> {
 // Handler to revoke a session token V2
 pub fn revoke_session_token_handler_v2(ctx: Context<RevokeSessionTokenV2>) -> Result<()> {
     // If the session is still active, the authority must be a signer
-    if !ctx.accounts.session_token.is_expired()?  {
-        require!(ctx.accounts.authority.is_signer, SessionError::InvalidAuthority);
+    if !ctx.accounts.session_token.is_expired()? {
+        require!(
+            ctx.accounts.authority.is_signer,
+            SessionError::InvalidAuthority
+        );
     }
     Ok(())
 }
@@ -480,7 +520,6 @@ impl SessionTokenV2 {
         // Check if the token has expired
         self.is_expired()
     }
-
 }
 
 pub trait Session<'info> {

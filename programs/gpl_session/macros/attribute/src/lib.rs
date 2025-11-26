@@ -83,7 +83,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let session_token_field = fields
         .named
         .iter()
-        .find(|field| field.ident.as_ref().unwrap().to_string() == "session_token")
+        .find(|field| *field.ident.as_ref().unwrap() == "session_token")
         .expect("Session trait can only be derived for structs with a session_token field");
     {
         let session_token_type = &session_token_field.ty;

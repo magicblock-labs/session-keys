@@ -1,0 +1,86 @@
+name: Publish Crates & SDKs
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - "release/v*"
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  rust_version: 1.85.0
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install essentials
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config build-essential libudev-dev
+          npm install --global yarn
+
+      - name: Install Rust
+        shell: "bash"
+        run: rustup toolchain install ${{ env.rust_version }} --profile minimal
+
+      - name: Cache rust
+        uses: Swatinem/rust-cache@v2
+
+  lint:
+    needs: install
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run fmt
+        run: cargo fmt -- --check
+
+      - name: Run clippy
+        run: cargo clippy -- --deny=warnings
+
+  publish:
+    needs: [install, lint]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: run build
+        working-directory: ./
+        run: |
+          cargo build
+          cargo test
+
+      - name: Set DRY_RUN based on trigger
+        run: echo "DRY_RUN=true" >> $GITHUB_ENV
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/v')
+
+      - name: cargo publish
+        working-directory: ./
+        run: |
+          DRY_RUN_FLAG=""
+          if [ "${DRY_RUN}" = "true" ]; then
+            DRY_RUN_FLAG="--dry-run"
+          fi
+
+          if [ "${DRY_RUN}" = "true" ]; then
+            NO_VERIFY_FLAG="--no-verify"
+          fi      
+
+          if [ "${DRY_RUN}" != "true" ]; then
+            cargo publish $DRY_RUN_FLAG --manifest-path=./Cargo.toml --token $CRATES_TOKEN $NO_VERIFY_FLAG
+          fi
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+          DRY_RUN: ${{ env.DRY_RUN }}
+
+     
