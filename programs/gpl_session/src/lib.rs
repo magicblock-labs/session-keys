@@ -1,6 +1,9 @@
 #![allow(unexpected_cfgs)]
 
-use anchor_lang::{prelude::*, solana_program::native_token::LAMPORTS_PER_SOL, system_program};
+use anchor_lang::prelude::*;
+use anchor_lang::system_program;
+
+const LAMPORTS_PER_SOL: u64 = 1_000_000_000;
 
 #[cfg(feature = "no-entrypoint")]
 pub use session_keys_macros::*;
