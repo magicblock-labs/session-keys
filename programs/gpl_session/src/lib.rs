@@ -49,7 +49,12 @@ pub mod gpl_session {
     // Added the V2 instructions to support the new session token format.
     // The new format allows session to be created with a payer which on revoking
     // would send the lamports back to the payer.
-    pub fn create_session_v2(ctx: Context<CreateSessionTokenV2>, top_up: Option<bool>, valid_until: Option<i64>, lamports: Option<u64>) -> Result<()> {
+    pub fn create_session_v2(
+        ctx: Context<CreateSessionTokenV2>,
+        top_up: Option<bool>,
+        valid_until: Option<i64>,
+        lamports: Option<u64>,
+    ) -> Result<()> {
         let (top_up, valid_until) = process_session_params(top_up, valid_until)?;
         create_session_token_handler_v2(ctx, top_up, valid_until, lamports)
     }
@@ -375,8 +380,11 @@ pub struct RevokeSessionTokenV2<'info> {
 // Handler to revoke a session token V2
 pub fn revoke_session_token_handler_v2(ctx: Context<RevokeSessionTokenV2>) -> Result<()> {
     // If the session is still active, the authority must be a signer
-    if !ctx.accounts.session_token.is_expired()?  {
-        require!(ctx.accounts.authority.is_signer, SessionError::InvalidAuthority);
+    if !ctx.accounts.session_token.is_expired()? {
+        require!(
+            ctx.accounts.authority.is_signer,
+            SessionError::InvalidAuthority
+        );
     }
     Ok(())
 }
@@ -480,7 +488,6 @@ impl SessionTokenV2 {
         // Check if the token has expired
         self.is_expired()
     }
-
 }
 
 pub trait Session<'info> {
