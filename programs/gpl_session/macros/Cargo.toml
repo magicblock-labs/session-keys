@@ -1,6 +1,6 @@
 [package]
 name = "session-keys-macros"
-version = "0.1.2"
+version = { workspace = true }
 edition = "2021"
 authors = ["Magicblock Dev <dev@magicblock.gg>"]
 license = "GPL-3.0-or-later"
@@ -10,4 +10,4 @@ repository = "https://github.com/magicblock-labs/gum-program-library"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-session-keys-macros-attribute = { version = "0.1.2", path = "attribute" }
+session-keys-macros-attribute = { workspace = true , path = "attribute" }

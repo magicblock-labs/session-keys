@@ -1,10 +1,28 @@
 [workspace]
-resolver = "2"
 members = [
     "programs/gpl_session",
     "programs/gpl_session/macros",
     "programs/gpl_session/macros/attribute",
 ]
+
+resolver = "2"
+
+[workspace.package]
+version = "3.0.10"
+authors = ["Magicblock Labs <dev@magicblock.gg>"]
+edition = "2021"
+license = "MIT"
+homepage = "https://www.magicblock.gg/"
+documentation = "https://docs.magicblock.gg/"
+repository = "https://github.com/magicblock-labs/session-keys"
+readme = "README.md"
+
+[workspace.dependencies]
+session-keys = { path = "programs/gpl_session", version = "=3.0.10" }
+session-keys-macros = { path = "programs/gpl_session/macros", version = "=3.0.10" }
+session-keys-macros-attribute = { path = "programs/gpl_session/macros/attribute", version = "=3.0.10" }
+
+# Magicblock
 
 [profile.release]
 overflow-checks = true
