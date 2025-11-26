@@ -818,14 +818,14 @@ dependencies = [
 
 [[package]]
 name = "session-keys-macros"
-version = "0.1.2"
+version = "3.0.10"
 dependencies = [
  "session-keys-macros-attribute",
 ]
 
 [[package]]
 name = "session-keys-macros-attribute"
-version = "0.1.2"
+version = "3.0.10"
 dependencies = [
  "proc-macro2",
  "quote",
