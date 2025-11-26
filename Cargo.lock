@@ -1061,7 +1061,7 @@ dependencies = [
 
 [[package]]
 name = "session-keys"
-version = "2.0.8"
+version = "3.0.10"
 dependencies = [
  "anchor-lang",
  "session-keys-macros",
