@@ -1,4 +1,3 @@
-
 Gum, at its core, is a decentralized social media protocol on Solana. It unbundles traditional social media into Social Legos similar to how Defi unbundled traditional finance into Money Legos.
 
 ![Gum Social Legos](https://2840179994-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FhE7mGtqPpj3sUoePsT2p%2Fuploads%2FdPZGJ7tF8CQotSD0LIUK%2Flegos.e93068d9.svg?alt=media&token=7537963b-33a6-4e08-901f-d4c67f40586c)
@@ -24,6 +23,16 @@ On the other hand, a wallet as a unique user identifier across all applications 
 Our thesis is that this is the key ingredient missing from most consumer applications and Gum is here to solve that.
 
 Documentation: https://docs.gum.fun/
+
+## Generating the SDK
+
+To generate the TypeScript SDK for the session keys program, run:
+
+```bash
+anchor run generate-clients
+```
+
+This will generate the client code in the `clients/gpl_session/src/generated/` directory with the standard structure including accounts, errors, instructions, programs, and shared folders.
 
 _NOTE_:
 
