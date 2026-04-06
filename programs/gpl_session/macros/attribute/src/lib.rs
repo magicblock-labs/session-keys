@@ -27,6 +27,7 @@ fn is_session(attr: &syn::Attribute) -> bool {
     attr.path.is_ident("session")
 }
 
+#[derive(Copy, Clone, Eq, PartialEq)]
 enum SessionTokenType {
     V1,
     V2,
@@ -36,7 +37,7 @@ fn get_session_token_type(ty: &Type) -> Option<SessionTokenType> {
     let Type::Path(TypePath { path, .. }) = ty else {
         return None;
     };
-    let Some(seg) = path.segments.first() else {
+    let Some(seg) = path.segments.last() else {
         return None;
     };
     if seg.ident != "Option" {
@@ -51,7 +52,7 @@ fn get_session_token_type(ty: &Type) -> Option<SessionTokenType> {
     else {
         return None;
     };
-    let Some(acct_seg) = acct_path.segments.first() else {
+    let Some(acct_seg) = acct_path.segments.last() else {
         return None;
     };
     if acct_seg.ident != "Account" {
@@ -69,10 +70,10 @@ fn get_session_token_type(ty: &Type) -> Option<SessionTokenType> {
         return None;
     };
 
-    if st_path.segments.len() == 1 {
-        if st_path.segments[0].ident == "SessionToken" {
+    if let Some(st_seg) = st_path.segments.last() {
+        if st_seg.ident == "SessionToken" {
             return Some(SessionTokenType::V1);
-        } else if st_path.segments[0].ident == "SessionTokenV2" {
+        } else if st_seg.ident == "SessionTokenV2" {
             return Some(SessionTokenType::V2);
         }
     }
@@ -81,7 +82,8 @@ fn get_session_token_type(ty: &Type) -> Option<SessionTokenType> {
 
 /// Core derive implementation that supports both V1 (`SessionToken`) and V2 (`SessionTokenV2`).
 /// Auto-detects which variant to use based on the `session_token` field type.
-fn derive_impl(input: TokenStream) -> TokenStream {
+/// If `expected` is `Some`, validates that the detected type matches.
+fn derive_impl(input: TokenStream, expected: Option<SessionTokenType>) -> TokenStream {
     let input_parsed = parse_macro_input!(input as DeriveInput);
 
     let fields = match input_parsed.data {
@@ -102,6 +104,17 @@ fn derive_impl(input: TokenStream) -> TokenStream {
     let session_token_type = &session_token_field.ty;
     let token_type = get_session_token_type(session_token_type)
         .expect("Session trait can only be derived for structs with a session_token field of type Option<Account<'info, SessionToken>> or Option<Account<'info, SessionTokenV2>>");
+
+    if let Some(expected) = expected {
+        if token_type != expected {
+            return syn::Error::new_spanned(
+                &session_token_field.ty,
+                "#[derive(SessionV2)] requires Option<Account<'info, SessionTokenV2>>",
+            )
+            .to_compile_error()
+            .into();
+        }
+    }
 
     // Session Token field must have the #[session] attribute
     let session_attr = session_token_field
@@ -184,14 +197,14 @@ fn derive_impl(input: TokenStream) -> TokenStream {
 ///   - `Option<Account<'info, SessionTokenV2>>` → implements `SessionV2`
 #[proc_macro_derive(Session, attributes(session))]
 pub fn derive_session(input: TokenStream) -> TokenStream {
-    derive_impl(input)
+    derive_impl(input, None)
 }
 
 /// Explicit V2 derive macro — same implementation as `#[derive(Session)]`,
 /// provided for clarity when using `SessionTokenV2`.
 #[proc_macro_derive(SessionV2, attributes(session))]
 pub fn derive_session_v2(input: TokenStream) -> TokenStream {
-    derive_impl(input)
+    derive_impl(input, Some(SessionTokenType::V2))
 }
 
 struct SessionAuthArgs(syn::Expr, syn::Expr);
