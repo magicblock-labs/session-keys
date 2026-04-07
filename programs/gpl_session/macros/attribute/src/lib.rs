@@ -33,7 +33,14 @@ enum SessionTokenType {
     V2,
 }
 
-fn get_session_token_type(ty: &Type) -> Option<SessionTokenType> {
+/// Result of parsing the session_token field type.
+struct SessionTokenInfo {
+    token_type: SessionTokenType,
+    /// The lifetime from Account<'info, ...> — used in generated impl.
+    lifetime: syn::Lifetime,
+}
+
+fn get_session_token_info(ty: &Type) -> Option<SessionTokenInfo> {
     let Type::Path(TypePath { path, .. }) = ty else {
         return None;
     };
@@ -62,9 +69,10 @@ fn get_session_token_type(ty: &Type) -> Option<SessionTokenType> {
         return None;
     };
     let mut args = acct_args.args.iter();
-    let Some(GenericArgument::Lifetime(_)) = args.next() else {
+    let Some(GenericArgument::Lifetime(lifetime)) = args.next() else {
         return None;
     };
+    let lifetime = lifetime.clone();
     let Some(GenericArgument::Type(Type::Path(TypePath { path: st_path, .. }))) = args.next()
     else {
         return None;
@@ -72,9 +80,9 @@ fn get_session_token_type(ty: &Type) -> Option<SessionTokenType> {
 
     if let Some(st_seg) = st_path.segments.last() {
         if st_seg.ident == "SessionToken" {
-            return Some(SessionTokenType::V1);
+            return Some(SessionTokenInfo { token_type: SessionTokenType::V1, lifetime });
         } else if st_seg.ident == "SessionTokenV2" {
-            return Some(SessionTokenType::V2);
+            return Some(SessionTokenInfo { token_type: SessionTokenType::V2, lifetime });
         }
     }
     None
@@ -102,8 +110,9 @@ fn derive_impl(input: TokenStream, expected: Option<SessionTokenType>) -> TokenS
         .expect("Session trait can only be derived for structs with a session_token field");
 
     let session_token_type = &session_token_field.ty;
-    let token_type = get_session_token_type(session_token_type)
+    let info = get_session_token_info(session_token_type)
         .expect("Session trait can only be derived for structs with a session_token field of type Option<Account<'info, SessionToken>> or Option<Account<'info, SessionTokenV2>>");
+    let token_type = info.token_type;
 
     if let Some(expected) = expected {
         if token_type != expected {
@@ -133,15 +142,9 @@ fn derive_impl(input: TokenStream, expected: Option<SessionTokenType>) -> TokenS
     let struct_name = &input_parsed.ident;
     let (impl_generics, ty_generics, where_clause) = input_parsed.generics.split_for_impl();
 
-    // Extract the 'info lifetime to pass to the trait path (traits only accept one lifetime,
-    // not the full ty_generics which may include extra type params).
-    let info_lifetime = input_parsed
-        .generics
-        .lifetimes()
-        .next()
-        .expect("Session derive requires a lifetime parameter")
-        .lifetime
-        .clone();
+    // Use the lifetime extracted from the session_token field type (Account<'info, ...>).
+    // This ensures we use the exact lifetime from the field, not the struct's first lifetime.
+    let info_lifetime = info.lifetime;
 
     let output = match token_type {
         SessionTokenType::V1 => quote! {
