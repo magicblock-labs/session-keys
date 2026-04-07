@@ -494,9 +494,10 @@ impl SessionTokenV2 {
 }
 
 impl SessionTokenV2 {
+    /// Returns `true` when the token has expired (`now >= valid_until`).
     pub fn is_expired(&self) -> Result<bool> {
         let now = Clock::get()?.unix_timestamp;
-        Ok(now > self.valid_until)
+        Ok(now >= self.valid_until)
     }
 
     // validate the token
@@ -517,8 +518,9 @@ impl SessionTokenV2 {
 
         require_eq!(pda, ctx.session_token.key(), SessionError::InvalidToken);
 
-        // Check if the token has expired
-        self.is_expired()
+        // Check if the token is still valid (not expired)
+        let expired = self.is_expired()?;
+        Ok(!expired)
     }
 }
 
