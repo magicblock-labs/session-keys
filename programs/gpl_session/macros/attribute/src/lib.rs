@@ -133,24 +133,34 @@ fn derive_impl(input: TokenStream, expected: Option<SessionTokenType>) -> TokenS
     let struct_name = &input_parsed.ident;
     let (impl_generics, ty_generics, where_clause) = input_parsed.generics.split_for_impl();
 
+    // Extract the 'info lifetime to pass to the trait path (traits only accept one lifetime,
+    // not the full ty_generics which may include extra type params).
+    let info_lifetime = input_parsed
+        .generics
+        .lifetimes()
+        .next()
+        .expect("Session derive requires a lifetime parameter")
+        .lifetime
+        .clone();
+
     let output = match token_type {
         SessionTokenType::V1 => quote! {
             #[automatically_derived]
-            impl #impl_generics ::session_keys::Session #ty_generics for #struct_name #ty_generics #where_clause {
+            impl #impl_generics ::session_keys::Session<#info_lifetime> for #struct_name #ty_generics #where_clause {
 
-                fn target_program(&self) -> Pubkey {
+                fn target_program(&self) -> ::anchor_lang::prelude::Pubkey {
                     crate::id()
                 }
 
-                fn session_token(&self) -> Option<Account<'info, ::session_keys::SessionToken>> {
+                fn session_token(&self) -> Option<::anchor_lang::prelude::Account<#info_lifetime, ::session_keys::SessionToken>> {
                     self.session_token.clone()
                 }
 
-                fn session_authority(&self) -> Pubkey {
+                fn session_authority(&self) -> ::anchor_lang::prelude::Pubkey {
                     self.#session_authority
                 }
 
-                fn session_signer(&self) -> Signer<'info> {
+                fn session_signer(&self) -> ::anchor_lang::prelude::Signer<#info_lifetime> {
                     self.#session_signer.clone()
                 }
 
@@ -158,21 +168,21 @@ fn derive_impl(input: TokenStream, expected: Option<SessionTokenType>) -> TokenS
         },
         SessionTokenType::V2 => quote! {
             #[automatically_derived]
-            impl #impl_generics ::session_keys::SessionV2 #ty_generics for #struct_name #ty_generics #where_clause {
+            impl #impl_generics ::session_keys::SessionV2<#info_lifetime> for #struct_name #ty_generics #where_clause {
 
-                fn target_program(&self) -> Pubkey {
+                fn target_program(&self) -> ::anchor_lang::prelude::Pubkey {
                     crate::id()
                 }
 
-                fn session_token(&self) -> Option<Account<'info, ::session_keys::SessionTokenV2>> {
+                fn session_token(&self) -> Option<::anchor_lang::prelude::Account<#info_lifetime, ::session_keys::SessionTokenV2>> {
                     self.session_token.clone()
                 }
 
-                fn session_authority(&self) -> Pubkey {
+                fn session_authority(&self) -> ::anchor_lang::prelude::Pubkey {
                     self.#session_authority
                 }
 
-                fn session_signer(&self) -> Signer<'info> {
+                fn session_signer(&self) -> ::anchor_lang::prelude::Signer<#info_lifetime> {
                     self.#session_signer.clone()
                 }
 
